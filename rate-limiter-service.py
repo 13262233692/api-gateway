@@ -1,6 +1,7 @@
 import time
 import threading
 from flask import Flask, request, jsonify
+from waitress import serve
 import requests
 
 app = Flask(__name__)
@@ -125,8 +126,7 @@ def check():
             bucket = TokenBucket(DEFAULT_CAPACITY, DEFAULT_REFILL_RATE)
             rate_limits[key] = bucket
             print(f"[限流决策器] 自动创建默认限流器: {key}")
-
-    result = bucket.try_consume(tokens)
+        result = bucket.try_consume(tokens)
 
     if not result['allowed']:
         print(f"[限流决策器] 请求被限流: {key}")
@@ -224,4 +224,4 @@ if __name__ == '__main__':
     sync_with_registry()
     print(f"[限流决策器] 服务启动成功，监听端口: {PORT}")
     print(f"[限流决策器] 健康检查: http://localhost:{PORT}/api/ratelimit/health")
-    app.run(host='0.0.0.0', port=PORT, debug=False, use_reloader=False, threaded=True, processes=1)
+    serve(app, host='0.0.0.0', port=PORT, threads=16)

@@ -3,6 +3,7 @@ import random
 import string
 import threading
 from flask import Flask, request, jsonify
+from waitress import serve
 
 app = Flask(__name__)
 PORT = 8001
@@ -212,4 +213,4 @@ def health():
 if __name__ == '__main__':
     print(f"[注册中心] 服务启动成功，监听端口: {PORT}")
     print(f"[注册中心] 健康检查: http://localhost:{PORT}/api/registry/health")
-    app.run(host='0.0.0.0', port=PORT, debug=False, use_reloader=False, threaded=True, processes=1)
+    serve(app, host='0.0.0.0', port=PORT, threads=16)
